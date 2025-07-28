@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.mvc.book.BookDAOInter"> <!-- BookDAO 인터페이스와 연결 -->
+  
+  <!-- 책 등록 -->
+  <insert id="create" parameterType="dev.mvc.book.BookVO">
+    INSERT INTO books (bookno, title, author, publisher, cnt,published_date, created_at, seqno, VISIBLE)
+    VALUES (BOOKS_SEQ.nextval, #{title}, #{author}, #{publisher},0, #{published_date}, SYSDATE, #{seqno}, #{visible})
+  </insert>
+  <select id="list_all" resultType="dev.mvc.book.BookVO">
+    SELECT bookno, title, author,cnt, publisher, published_date, created_at, seqno, visible
+    FROM books
+    ORDER BY bookno ASC
+  </select>
+  
+  <select id="read" resultType="dev.mvc.book.BookVO" parameterType="Integer">
+    SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible
+    FROM books
+    WHERE bookno = #{bookno} ORDER BY bookno ASC
+  </select>
+  
+  <update id = "update" parameterType="dev.mvc.book.BookVO">
+    UPDATE books
+    SET title = #{title}, author = #{author}, cnt=#{cnt}, publisher = #{publisher}, seqno = #{seqno}, VISIBLE = #{visible}
+    WHERE bookno=#{bookno}
+  </update>
+  
+  <delete id = "delete" parameterType="dev.mvc.book.BookVO">
+    DELETE FROM books WHERE bookno=#{bookno}
+  </delete>
+  
+  <!-- 우선 순위 높임, 10 등 -> 1 등 -->
+  <update id="update_seqno_forward" parameterType="Integer">
+    UPDATE books SET seqno=seqno-1 WHERE bookno=#{bookno}
+  </update>
+
+  <!-- 우선 순위 낮춤, 1 등 -> 10 등 -->
+  <update id="update_seqno_backward" parameterType="Integer">
+    UPDATE books SET seqno=seqno+1 WHERE bookno=#{bookno}
+  </update>
+
+  <!-- 카테고리 공개 설정 -->
+  <update id="update_visible_y" parameterType="Integer">
+    UPDATE books SET visible='Y' WHERE bookno=#{bookno}
+  </update>
+  
+  <!-- 카테고리 비공개 설정 -->
+  <update id="update_visible_n" parameterType="Integer">
+    UPDATE books SET visible='N' WHERE bookno=#{bookno}
+  </update>
+  
+  <!-- 공개된 대분류만 출력 -->
+  <select id="list_all_author_y" resultType="dev.mvc.book.BookVO">
+    SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible
+    FROM books 
+    WHERE title='--' AND visible='Y' 
+    ORDER BY seqno ASC
+  </select>
+  
+  <!-- 특정 그룹의 중분류 출력 -->
+  <select id="list_all_title_y" resultType="dev.mvc.book.BookVO" parameterType="String">
+    SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible
+    FROM books 
+    WHERE author=#{author} AND title != '--' AND visible = 'Y' 
+    ORDER BY seqno ASC
+  </select>
+  
+  <!-- 카테고리 그룹 목록 -->
+  <select id="authorset" resultType="String">
+    SELECT author 
+    FROM books 
+    WHERE title = '--'
+    ORDER BY seqno ASC
+  </select>
+
+  <!-- 검색
+        SQL -> BookVO 객체 레코드 수 만큼 생성 -> ArrayList<bookVO> 객체가 생성되어 BookDAOInter로 리턴  -->
+  <select id="list_search" resultType="dev.mvc.book.BookVO" parameterType="String">
+    SELECT bookno, title, author, cnt,  publisher, published_date, created_at, seqno, visible
+    FROM books
+    <if test="word != null and word != ''"> <!-- 검색 상태라면 WHERE 생성 -->
+      WHERE (UPPER(author) LIKE '%' || UPPER(#{word}) || '%') OR (UPPER(title) LIKE '%' || UPPER(#{word}) || '%')
+    </if> 
+    ORDER BY seqno ASC
+  </select>
+
+  <!-- 검색 갯수 -->
+  <select id="list_search_count" resultType="Integer" parameterType="String">
+    SELECT COUNT(*) as cnt
+    FROM books
+    <if test="word != null and word != ''"> <!-- 검색 상태라면 WHERE 생성 -->
+      WHERE (UPPER(author) LIKE '%' || UPPER(#{word}) || '%') OR (UPPER(title) LIKE '%' || UPPER(#{word}) || '%')
+    </if> 
+    ORDER BY seqno ASC
+  </select>
+
+  <!-- 검색
+        SQL -> BookVO 객체 레코드 수 만큼 생성 -> ArrayList<bookVO> 객체가 생성되어 BookDAOInter로 리턴  -->
+  <select id="list_search_paging" resultType="dev.mvc.book.BookVO" parameterType="Map">
+    SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible, r
+    FROM (
+        SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible, rownum as r
+        FROM (
+            SELECT bookno, title, author, cnt, publisher, published_date, created_at, seqno, visible
+            FROM books
+            <if test="word != null and word != ''"> <!-- 검색 상태라면 WHERE 생성 -->
+              WHERE (UPPER(author) LIKE '%' || UPPER(#{word}) || '%') OR (UPPER(title) LIKE '%' || UPPER(#{word}) || '%')
+            </if> 
+            ORDER BY seqno ASC
+        )
+    )
+    WHERE r &gt;= #{start_num} AND r &lt;= #{end_num}  <!-- WHERE r >= 7 AND r <= 9 -->
+  </select>
+  
+  <!-- 특정 그룹(bookno)에 속한 레코드 수 조회 -->
+  <select id="countByBookno" parameterType="int" resultType="int">
+    SELECT COUNT(*) AS cnt
+    FROM record
+    WHERE bookno = #{bookno}
+  </select>
+
+  <!-- 특정 관리자(reviewerno)에 속한 레코드 수 조회 -->
+  <select id="countByReviewerno" parameterType="int" resultType="int">
+    SELECT COUNT(*) AS cnt
+    FROM record
+    WHERE reviewerno = #{reviewerno}
+  </select>
+
+  <!-- 특정 그룹(bookno)에 속한 레코드 삭제 -->
+  <delete id="deleteByBookno" parameterType="int">
+    DELETE FROM record
+    WHERE bookno = #{bookno}
+  </delete>
+
+  <!-- 특정 관리자(reviewerno)에 속한 레코드 삭제 -->
+  <delete id="deleteByReviewerno" parameterType="int">
+    DELETE FROM record
+    WHERE reviewerno = #{reviewerno}
+  </delete>
+
+<update id="update_author_cnt_down" parameterType="Map">
+    UPDATE books
+    SET cnt = cnt - #{deleteCount}  <!-- 자식 레코드 수만큼 감소 -->
+    WHERE title = '--' AND author = #{author}
+</update>
+</mapper>

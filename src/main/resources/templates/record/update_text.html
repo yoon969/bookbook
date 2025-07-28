@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+  <div class='title_line'>
+    <span th:text="${bookVO.author }" class="title_line_text"></span > 
+    > <span th:text="${bookVO.title}" class="title_line_text"></span > 
+    > 글 수정
+  </div>
+  
+  <aside class="aside_right">
+    <a th:href="@{|./create?bookno=${bookVO.bookno }|}">등록</a>
+    <span class='menu_divide' >│</span>
+    <a href="javascript:location.reload();">새로고침</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./list_by_bookno_search_paging?bookno=${bookVO.bookno }|}">기본 목록형</a>    
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./list_by_bookno_grid?bookno=${bookVO.bookno }|}">갤러리형</a>
+  </aside>
+  
+  <div class='menu_line'></div>
+  
+  <form name='frm' method='post' th:object="${recordVO}" action='./update_text'>
+    <input type="hidden" name="bookno" th:value="${bookVO.bookno }">
+    <input type="hidden" name="recordno" th:value="${recordVO.recordno }">
+    <input type="hidden" name="now_page" th:value="${now_page}">
+    <input type="hidden" name="search_word" th:value="${word}">
+    
+    <div>
+       <label>제목</label>8
+       <input type='text' name='title' th:value='${recordVO.title}' required="required" 
+                 autofocus="autofocus" class="form-control" style='width: 100%;'>
+    </div>
+    <div>
+       <label>내용</label>
+       <textarea name='record' required="required" class="form-control" rows="12" style='width: 100%;' 
+                      th:text='${recordVO.record}'></textarea>
+    </div>
+    <div>
+       <label>검색어</label>
+       <input type='text' name='word' th:value='${recordVO.word}' required="required" 
+                 class="form-control" style='width: 100%;'>
+    </div>   
+    <div>
+       <label>패스워드</label>
+       <input type='password' name='passwd' required="required" 
+                 class="form-control" style='width: 50%;'>
+    </div>
+    <div class="content_body_bottom">
+      <button type="submit" class="btn btn-secondary btn-sm">저장</button>
+      <button type="button" th:attr="onclick=|location.href='./list_by_bookno?bookno=${bookVO.bookno}'|" class="btn btn-secondary btn-sm">목록</button>
+    </div>
+  
+  </form>
+
+</div>

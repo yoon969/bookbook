@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+  <div class="title_line">책정보 삭제</div>
+  <aside class="aside_right">
+    <a href="javascript: location.reload();">새로 고침</a>
+    <span class="menu_divide">|</span>
+    <a th:href="@{|/book/list_all|}">목록</a>
+    <span class="menu_divide">|</span>
+    <a th:href="@{|/book/update/${bookVO.bookno}?word=${word}&now_page=${now_page}|}">수정</a>
+    <span class="menu_divide">|</span>
+    <a th:href="@{|/book/delete/${bookVO.bookno}?word=${word}&now_page=${now_page}|}">삭제</a>
+    <span class="menu_divide">|</span>
+    <a th:href="@{|/book/create|}">등록</a>
+  </aside>
+
+  <div th:replace="~{book/list_search_com::list_search_fragment}"></div>
+
+  <div class="menu_line"></div>
+
+
+  <div style="width: 50%; margin: 0px auto;">
+    <form name="frm" method="post" th:action="|/book/delete/${bookVO.bookno}|" th:object="${bookVO}">
+      <input type="hidden" name="word" th:value="${word}">
+      <input type="hidden" name="now_page" th:value="${now_page}">
+  
+      <!-- 조건에 따른 메시지 -->
+      <div class="msg_warning" th:if="${childCount > 0}">
+        <span th:text="${bookVO.author}"></span> 관련 자료 <span th:text="${childCount}"></span>건이 발견되었습니다.<br>
+        관련 자료와 저자를 모두 삭제하시겠습니까?
+      </div>
+      <div class="msg_warning" th:unless="${childCount > 0}">
+        저자를 삭제하면 복구 할 수 없습니다.<br>삭제하시려면 [삭제] 버튼을 클릭하세요.
+      </div>
+  
+      <!-- 공통 정보 출력 -->
+      <div style="width: 60%; margin: 0px auto; background-color: #DDDDDD;">
+        <label>저자</label>: <span th:text="${bookVO.author}"></span><br>
+        <label>책 제목</label>: <span th:text="${bookVO.title}"></span><br>
+      </div>
+  
+      <!-- 공통 버튼 -->
+      <div class="content_body_bottom">
+        <button type="submit" class="btn btn-secondary btn-sm">삭제</button>
+        <button type="button"
+                th:attr="onclick=|location.href='/book/list_search?word=${word}&now_page=${now_page}'|"
+                class="btn btn-secondary btn-sm">취소[목록]</button>
+      </div>
+    </form>
+  </div>
+
+  <div th:replace="~{book/list_all_com::list_all_fragment}"></div>
+</div>
+
+</html>

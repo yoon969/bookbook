@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.memo.MemoDAOInter">
+
+  <!-- 1. 메모 등록 -->
+  <insert id="create" parameterType="dev.mvc.memo.MemoVO">
+    INSERT INTO memo (
+      memono,
+      memotitle,
+      memocontent
+    )
+    VALUES (
+      memo_seq.NEXTVAL,
+      #{memotitle},
+      #{memocontent}
+    )
+  </insert>
+
+  <!-- 2. 메모 목록 조회 -->
+  <select id="list_all" resultType="dev.mvc.memo.MemoVO">
+    SELECT
+      memono,
+      memotitle,
+      memocontent,
+      created_date
+    FROM memo
+    ORDER BY memono DESC
+  </select>
+
+  <!-- 3. 메모 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM memo
+    WHERE memono = #{memono}
+  </delete>
+
+  <!-- 4. 메모 수정 -->
+  <update id="update" parameterType="dev.mvc.memo.MemoVO">
+    UPDATE memo
+    SET
+      memotitle = #{memotitle},
+      memocontent = #{memocontent}
+    WHERE memono = #{memono}
+  </update>
+
+  <!-- 5. 단일 메모 조회 (수정용 등) -->
+  <select id="read" parameterType="int" resultType="dev.mvc.memo.MemoVO">
+    SELECT
+      memono,
+      memotitle,
+      memocontent,
+      created_date
+    FROM memo
+    WHERE memono = #{memono}
+  </select>
+  
+  <select id="list_by_word_paging" resultType="dev.mvc.memo.MemoVO">
+  SELECT memono, memotitle, memocontent, created_date
+  FROM memo
+  WHERE memotitle LIKE '%' || #{word} || '%' 
+     OR memocontent LIKE '%' || #{word} || '%'
+  ORDER BY memono DESC
+  OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+</select>
+
+<select id="count_by_word" resultType="int">
+  SELECT COUNT(*)
+  FROM memo
+  WHERE memotitle LIKE '%' || #{word} || '%'
+     OR memocontent LIKE '%' || #{word} || '%'
+</select>
+
+</mapper>

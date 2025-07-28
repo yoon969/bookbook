@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.reviewer.ReviewerDAOInter">
+  
+  <!-- 아이디 중복 검사 -->
+  <select id="checkID" resultType="int" parameterType="String">
+    SELECT COUNT(reviewerid) as cnt
+    FROM reviewer
+    WHERE reviewerid = #{reviewerid}
+  </select>
+
+  <!-- 회원 가입 -->
+  <insert id="create" parameterType="dev.mvc.reviewer.ReviewerVO">
+    INSERT INTO reviewer(
+      reviewerno, reviewerid, reviewerpasswd, reviewername,
+      phonenumber, housecode, address1, address2, rdate, grade
+    )
+    VALUES (
+      reviewer_seq.nextval, #{reviewerid}, #{reviewerpasswd}, #{reviewername},
+      #{phonenumber}, #{housecode}, #{address1}, #{address2}, sysdate, #{grade}
+    )
+  </insert>
+
+  <!-- 전체 목록 -->
+  <select id="list" resultType="dev.mvc.reviewer.ReviewerVO">
+    SELECT reviewerno, reviewerid, reviewerpasswd, reviewername,
+           phonenumber, housecode, address1, address2, rdate, grade
+    FROM reviewer
+    ORDER BY grade ASC, reviewerid ASC
+  </select>
+
+  <!-- reviewerno로 조회 -->
+  <select id="read" resultType="dev.mvc.reviewer.ReviewerVO" parameterType="int">
+    SELECT reviewerno, reviewerid, reviewerpasswd, reviewername,
+           phonenumber, housecode, address1, address2, rdate, grade
+    FROM reviewer
+    WHERE reviewerno = #{reviewerno}
+  </select>
+
+  <!-- reviewerid로 조회 -->
+  <select id="readById" resultType="dev.mvc.reviewer.ReviewerVO" parameterType="String">
+    SELECT reviewerno, reviewerid, reviewerpasswd, reviewername,
+           phonenumber, housecode, address1, address2, rdate, grade
+    FROM reviewer
+    WHERE reviewerid = #{reviewerid}
+  </select>
+
+  <!-- 회원 정보 수정 -->
+  <update id="update" parameterType="dev.mvc.reviewer.ReviewerVO">
+    UPDATE reviewer 
+    SET reviewername = #{reviewername},
+        phonenumber = #{phonenumber},
+        housecode = #{housecode},
+        address1 = #{address1},
+        address2 = #{address2}
+    WHERE reviewerno = #{reviewerno}
+  </update>
+
+  <!-- 회원 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM reviewer
+    WHERE reviewerno = #{reviewerno}
+  </delete>
+
+  <!-- 로그인 -->
+  <select id="login" resultType="int" parameterType="HashMap">
+    SELECT COUNT(reviewerno) as cnt
+    FROM reviewer
+    WHERE reviewerid = #{reviewerid} AND reviewerpasswd = #{reviewerpasswd}
+  </select>
+
+  <!-- 현재 패스워드 검사 -->
+  <select id="passwd_check" resultType="int" parameterType="HashMap">
+    SELECT COUNT(reviewerno) as cnt
+    FROM reviewer
+    WHERE reviewerno = #{reviewerno} AND reviewerpasswd = #{reviewerpasswd}
+  </select>
+
+  <!-- 패스워드 변경 -->
+  <update id="passwd_update" parameterType="HashMap">
+    UPDATE reviewer
+    SET reviewerpasswd = #{reviewerpasswd}
+    WHERE reviewerno = #{reviewerno}
+  </update>
+
+</mapper>

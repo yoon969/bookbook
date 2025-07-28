@@ -1,0 +1,189 @@
+<!DOCTYPE html> 
+
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+  <script>
+    window.onload = function() {
+      // <img src="/record/images/hart_off_50.png" style="width: 22px" title="추천">          
+      // <img src="/record/images/hart_on_50.png" style="width: 22px" title="비추천">   
+      // 현재 로그인한 사용자의 추천 여부 반영
+
+      let hartCnt = '[[${hartCnt}]]'; //  javascript -> Thymeleaf -> session
+      let tag='';
+      
+      if (hartCnt == 1) {
+        tag = '<a href="javascript:good([[${recordVO.recordno}]])"><img src="/record/images/hart_on_50.png" style="width: 22px" title="추천"></a>';
+        document.querySelector('#hart_panel').innerHTML = tag; 
+      } else {
+        tag = '<a href="javascript:good([[${recordVO.recordno}]])"><img src="/record/images/hart_off_50.png" style="width: 22px" title="추천"></a>';
+        document.querySelector('#hart_panel').innerHTML = tag; 
+      }    
+      
+      document.querySelector('#recom_panel').innerHTML = '([[${recordVO.recom}]])';
+    }
+
+    function good(recordno) {
+      console.log('-> recordno: ' + recordno);
+
+      fetch("/record/good", { 
+          "method": "post",
+          "headers": {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({recordno}) // {"recordno":recordno}, JSON 형식으로 전송
+        })
+        .then((response) => response.json()) // 응답 문자열 추출
+        .then((data) => {
+          console.log('-> data.isReviewer: ' + data.isReviewer);
+
+          if (data.isReviewer == 1) { // 회원
+            let hartCnt =data.hartCnt; //  javascript -> Thymeleaf -> session
+            let tag='';
+            
+            if (hartCnt == 1) {
+              tag = '<a href="javascript:good([[${recordVO.recordno}]])"><img src="/record/images/hart_on_50.png" style="width: 22px" title="추천"></a>';
+              document.querySelector('#hart_panel').innerHTML = tag; 
+            } else {
+              tag = '<a href="javascript:good([[${recordVO.recordno}]])"><img src="/record/images/hart_off_50.png" style="width: 22px" title="추천"></a>';
+              document.querySelector('#hart_panel').innerHTML = tag; 
+            }    
+            
+            document.querySelector('#recom_panel').innerHTML = '(' + data.recom + ')';
+          
+          } else { // 비회원
+            alert("로그인해야 추천 할 수 있습니다.");
+            location.href='/reviewer/login_cookie_need';  
+
+          }
+        }
+      );
+    }
+  </script>
+  <div class='title_line'>
+    <span th:text="${bookVO.author }" class="title_line_text"></span > 
+    > <span th:text="${bookVO.title}" class="title_line_text"></span > 
+    > 글 조회
+  </div>
+  
+  <aside class="aside_right" th:if="${session.grade == 'admin'}">
+    <a href="javascript:location.reload();">새로고침</a>
+    <span class='menu_divide' >│</span>    
+    <a th:href="@{|./list_by_bookno?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">목록형</a>    
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./list_by_bookno_grid?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">갤러리형</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./create?bookno=${bookVO.bookno }|}">등록</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|/record/update_text?recordno=${recordVO.recordno}&now_page=${now_page}&word=${word }|}">글 수정</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./update_file?recordno=${recordVO.recordno}&word=${word}&now_page=${now_page}|}">파일 수정</a>  
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|/record/map?bookno=${recordVO.bookno }&recordno=${recordVO.recordno}|}">지도</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|/record/youtube?bookno=${recordVO.bookno }&recordno=${recordVO.recordno}&word=${word}&now_page=${now_page}|}">Youtube</a>
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./delete?recordno=${recordVO.recordno}&word=${word}&now_page=${now_page}&bookno=${recordVO.bookno}|}">삭제</a>  
+ </aside> 
+
+  <aside class="aside_right" th:if="${session.grade != 'admin'}">
+     <a href="javascript:location.reload();">새로고침</a>
+    <span class='menu_divide' >│</span>    
+    <a th:href="@{|./list_by_bookno?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">목록형</a>    
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./list_by_bookno_grid?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">갤러리형</a>
+  </aside> 
+ 
+  <div class='menu_line'></div>
+
+  <fieldset class="fieldset_basic">
+    <ul>
+      <li class="li_none">
+        <div style="width: 100%; word-break: break-all;">
+        
+          <div th:if="${recordVO.file1.endsWith('jpg') or recordVO.file1.endsWith('png')  or recordVO.file1.endsWith('gif') or recordVO.file1.endsWith('jpeg')}">
+            <img th:src="@{|/record/storage/${recordVO.file1saved}|}" style='width: 50%; float: left; margin-top: 0.5%; margin-right: 1%;'>
+          </div>
+
+          <span style="font-size: 1.5em; font-weight: bold;" th:text="${recordVO.title}"></span>
+          <span style="font-size: 1em;" th:text="${recordVO.rdate }"></span><br><br>
+          <div style="white-space: pre-wrap;"><span th:text="${recordVO.record}"></span></div>
+        </div>
+      </li>
+
+      <li class="li_none" style="clear: both; padding-top: 10px; padding-bottom: 25px;" 
+           th:if="${recordVO.map.length() > 0}">
+        <div style='text-align: center; width:640px; margin: 0px auto;'
+                th:utext = "${recordVO.map }">
+        </div>
+      </li>
+
+      <li class="li_none" style="clear: both; padding-top: 10px; padding-bottom: 25px;" 
+          th:if="${recordVO.youtube.length() > 0}">
+        <div style='text-align: center; width:640px; margin: 0px auto;'
+           th:utext = "${recordVO.youtube }">
+        </div>
+      </li>
+
+      <li class="li_none" th:text="|검색어(키워드): ${recordVO.word }|">
+      </li>
+      
+      <li class="li_none" th:if="${recordVO.size1 > 0}">
+        <div >
+          첨부 파일: <a th:href='@{|/download?dir=record/storage&filename=${recordVO.file1saved}&downname=${recordVO.file1}|}'
+                       th:text='|${recordVO.file1}|'></a> <span th:text="|(${recordVO.size1_label})|"></span>  
+                    <a th:href='@{|/download?dir=record/storage&filename=${recordVO.file1saved}&downname=${recordVO.file1}|}'><img src="/record/images/download.png"></a>
+          <span id="hart_panel"></span><span id="recom_panel"></span>          
+        </div>
+      </li>   
+
+      <!-- 댓글 등록 폼 -->
+<div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
+  <h3 style="margin-bottom: 10px;">댓글 작성</h3>
+
+  <form th:action="@{/reply/create}" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+    <input type="hidden" name="recordno" th:value="${recordVO.recordno}" />
+
+    <textarea name="record"
+              placeholder="댓글을 입력하세요"
+              required
+              style="resize: vertical; min-height: 80px; max-width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+
+    <input type="submit" value="등록"
+           class="btn btn-secondary btn-sm"
+           style="align-self: flex-end; padding: 4px 12px; font-size: 13px; border-radius: 4px;" />
+  </form>
+</div>
+
+
+<div th:each="reply : ${list}" 
+     style="padding: 10px 0; border-bottom: 1px solid #e0e0e0;"> <!-- ✅ 구분선 추가 -->
+
+  <!-- 작성자 / 작성일 -->
+  <div style="display: flex; justify-content: space-between; font-weight: bold;">
+    <div>작성자: [[${reply.reviewername}]]</div>
+    <div>작성일: [[${reply.rdate}]]</div>
+  </div>
+
+  <!-- 댓글 내용 + 삭제 버튼 -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+    <div class="reply-content" style="text-align: left;">
+      [[${reply.record}]]
+    </div>
+
+    <form th:if="${session.grade == 'admin'}" th:action="@{/reply/delete}" method="get">
+      <input type="hidden" name="replyno" th:value="${reply.replyno}" />
+      <input type="hidden" name="recordno" th:value="${recordVO.recordno}" />
+      <button type="submit"
+              style="padding: 4px 10px; font-size: 13px; border: 1px solid #999; border-radius: 4px; background: white;">
+        삭제
+      </button>
+    </form>
+  </div>
+</div>
+
+    </ul>
+  </fieldset>
+
+</div>
+
+</html>

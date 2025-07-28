@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+
+  <div class='title_line'>
+    <span th:text="${bookVO.author}" class="title_line_text"></span >
+    > <span th:text="${bookVO.title}" class="title_line_text"></span >
+    <span th:if="${word != ''}" th:text="|> ${word} (${search_count} 건)|" class="title_line_text"></span>
+  </div>
+
+  <aside class="aside_right">
+    <span th:if="${session.grade == 'admin'}">
+      <a th:href="@{|/record/create?bookno=${bookVO.bookno}|}">등록</a>
+      <span class="menu_devide">│</span>    
+    </span>
+    
+    <a href="javascript:location.reload();">새로고침</a>
+    <span class='menu_divide' >│</span>    
+    <a th:href="@{|./list_by_bookno?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">목록형</a>    
+    <span class='menu_divide' >│</span>
+    <a th:href="@{|./list_by_bookno_grid?bookno=${bookVO.bookno }&word=${word }&now_page=${now_page}|}">갤러리형</a>    
+  </aside> 
+
+  <!-- /record/list_search_com.html 파일의 list_search_fragment import -->
+  <div th:replace="~{record/list_search_com::list_search_fragment}"></div>
+     
+  <div class='menu_line'></div>
+       
+  <div style='width: 100%;'> <!-- 갤러리 Layout  시작 -->
+    <div th:if="${list.size() > 0}"  th:each="recordVO, status:${list}" 
+         th:attr="onclick=|location.href='/record/read?recordno=${recordVO.recordno}&word=${word}&now_page=${now_page}'|"
+         style='width: 24%; height: 200px; float: left; margin: 0.5%; padding: 0.5%; background-color: #EEEFFF; text-align: left; cursor: pointer; position:relative;'>
+
+      <div th:if="${recordVO.file1.endsWith('jpg') or recordVO.file1.endsWith('png') or recordVO.file1.endsWith('gif') or recordVO.file1.endsWith('jpeg')}"
+             style="width: 100%; height: 100px;">
+        <img th:src="@{|/record/storage/${recordVO.thumb1}|}" style="width: 100%; height: 100%;">
+      </div>
+
+      <div th:if="${((recordVO.file1.endsWith('jpg') or recordVO.file1.endsWith('png')  or recordVO.file1.endsWith('gif') or recordVO.file1.endsWith('jpeg')) == false) and (recordVO.size1 > 0)}"
+             style="width: 100%; height: 100px;">
+        <span th:text="${recordVO.file1}"></span>
+      </div>
+
+      <div th:if="${recordVO.size1 == 0}" style="width: 100%; height: 100px;">
+        <img src="/record/images/none1.png" style="width: 100%; height: 100%;">
+      </div>
+      <div>
+        <span th:if="${recordVO.title.length() > 10 }" 
+                  th:text="|${recordVO.title.substring(0, 10) }...|" style="font-size:14px; font-weight: bold;"></span>
+        <span th:if="${recordVO.title.length() <= 10 }" 
+                  th:text="|${recordVO.title}|" style="font-size:14px;font-weight: bold;"></span>
+        <br>
+        
+        <span th:if="${recordVO.record.length() > 20 }" 
+                  th:text="|${recordVO.record.substring(0, 20) }...|" style="font-size:12px;"></span>
+        <span th:if="${recordVO.record.length() <= 20 }" 
+                  th:text="|${recordVO.record}|" style="font-size:13px;"></span>
+      </div>
+      
+      <div style="position: absolute; bottom: 5px; left: 8px; font-size: 14px; color: #444;">
+        💬 [[${recordVO.replycnt}]]
+      </div>
+      <div style="position: absolute; bottom:0px; right: 5px; font-size: 18px;">♡</div>
+      
+    </div>
+    
+    <div th:if="${list.size() == 0}" style="text-align: center; padding: 50px 0px;">
+      <span>관련 글이 등록되지 않았습니다.</span>
+    </div> 
+  </div>  <!-- 갤러리 Layout  종료 -->
+   
+  <!-- 페이지 버튼 목록 출력 시작 -->
+  <div class="bottom_menu" th:utext="${paging}"></div>
+  <!-- 페이지 버튼 목록 출력 종료 --> 
+
+</div>
+</html>

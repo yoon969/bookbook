@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}"> <!-- layout.html 상속 -->
+<div layout:fragment="content">
+  <div class="title_line">책 등록</div>
+  <div style="width: 50%; margin: 0 auto;">  
+    <form name="frm" method="post" action="/book/create" th:object="${bookVO}">
+
+      <div>
+        <label>저자</label>
+        <input type="text" name="author" class="form-control form-control-sm" 
+               style="width: 100%;" th:field="*{author}">
+        <div th:if="${#fields.hasErrors('author')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#fields.errors('author')}" th:text="${err}"></div>
+        </div>
+      </div>
+
+      <div>
+        <label>책 제목</label>
+        <input type="text" name="title" class="form-control form-control-sm" 
+               style="width: 100%;" th:field="*{title}" autofocus>
+        <div th:if="${#fields.hasErrors('title')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#fields.errors('title')}" th:text="${err}"></div>
+        </div>
+      </div>
+      
+      
+      <div>
+        <label>출판사</label>
+        <input type="text" name="publisher" class="form-control form-control-sm" 
+               style="width: 100%;" th:field="*{publisher}">
+        <div th:if="${#fields.hasErrors('publisher')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#fields.errors('publisher')}" th:text="${err}"></div>
+        </div>
+      </div>
+      
+      <div>
+        <label>출판일</label>
+        <input type="date" name="published_date" class="form-control form-control-sm" 
+               style="width: 50%;" th:field="*{published_date}">
+        <div th:if="${#fields.hasErrors('published_date')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#fields.errors('published_date')}" th:text="${err}"></div>
+        </div>
+      </div>
+
+      <div>
+        <label>출력 순서</label>
+        <input type="number" name="seqno" value="1" min="1" max="1000000" step="1"
+               class="form-control fom-control-sm" style="width: 50%;" th:field="*{seqno}">
+        <div th:if="${#fields.hasErrors('seqno')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#lists.sort(#fields.errors('seqno'))}" th:text="${err}"></div>
+        </div>  
+      </div>
+      
+      <div>
+        <label>출력 모드(Y/N)</label>
+        <div style="margin-right: 2px; width: 15%; float: left;">
+          <select id="visible" name="visible" class="form-control">
+            <option value="출력 모드" selected="selected">출력 모드</option>
+            <option value="Y">Y</option>
+            <option value="N">N</option>
+          </select>
+        </div>
+        <div th:if="${#fields.hasErrors('visible')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#lists.sort(#fields.errors('visible'))}" th:text="${err}"></div>
+        </div>  
+      </div>
+      
+      
+      <div class="content_body_bottom">
+        <button type="submit" class="btn btn-secondary btn-sm">등록</button>
+        <button type="button" onclick="location.href='/book/list_all'" class="btn btn-secondary btn-sm">목록</button>
+      </div>
+    </form>
+  </div>  
+</div>
+</html>

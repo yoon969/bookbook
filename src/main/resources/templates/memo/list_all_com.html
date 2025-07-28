@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="list_all_fragment">
+
+  <div class="memo-gallery">
+    <div class="memo-card" th:each="memoVO : ${list}">
+
+
+      <!-- ✅ 우측 상단 수정/삭제 아이콘 (관리자만 보이게) -->
+      <div class="memo-actions" th:if="${session.grade} == 'admin'">
+        <a th:href="@{|/memo/update?memono=${memoVO.memono}|}">
+          <img src="/memo/images/update.png" class="icon" title="수정">
+        </a>
+        <a th:href="@{|/memo/delete?memono=${memoVO.memono}|}">
+          <img src="/memo/images/delete.png" class="icon" title="삭제">
+        </a>
+      </div>
+
+      <!-- 카드 내용 -->
+      <div class="memo-title" th:text="${memoVO.memotitle}">제목</div>
+      <div class="memo-content" th:text="${#strings.abbreviate(memoVO.memocontent, 60)}">내용</div>
+      <div class="memo-date" th:text="${memoVO.created_date}">등록일</div>
+      <a class="memo-link" th:href="@{|/memo/read?memono=${memoVO.memono}|}">자세히 보기 →</a>
+
+    </div>
+  </div>
+
+  <!-- ✅ 페이지네이션 -->
+  <div style="text-align: center; margin-top: 30px;">
+    <span th:if="${startPage > 1}">
+      <a th:href="@{/memo/list_all(word=${word}, now_page=${startPage - 1})}">&lt;</a>
+    </span>
+    <span th:unless="${startPage > 1}">
+      <span style="color: #ccc;">&lt;</span>
+    </span>
+
+    <span th:each="pageNum : ${#numbers.sequence(startPage, endPage)}">
+      <a th:href="@{/memo/list_all(word=${word}, now_page=${pageNum})}" th:text="${pageNum}"
+        th:classappend="${now_page} == ${pageNum} ? 'current-page' : ''" style="margin: 0 5px;">
+      </a>
+    </span>
+
+    <span th:if="${endPage < totalPage}">
+      <a th:href="@{/memo/list_all(word=${word}, now_page=${endPage + 1})}">&gt;</a>
+    </span>
+    <span th:unless="${endPage < totalPage}">
+      <span style="color: #ccc;">&gt;</span>
+    </span>
+  </div>
+
+  <!-- ✅ 스타일 -->
+  <style>
+    .memo-gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .memo-card {
+      position: relative;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+
+    .memo-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .memo-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .memo-actions a {
+      margin-left: 5px;
+    }
+
+    .memo-actions img.icon {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .memo-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .memo-content {
+      font-size: 14px;
+      color: #555;
+      flex-grow: 1;
+      margin-bottom: 10px;
+    }
+
+    .memo-date {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .memo-link {
+      font-size: 13px;
+      color: #FF6347;
+      text-decoration: none;
+      align-self: flex-start;
+    }
+
+    .current-page {
+      font-weight: bold;
+      color: #FF6347;
+      text-decoration: underline;
+    }
+  </style>
+
+</div>
+
+</html>

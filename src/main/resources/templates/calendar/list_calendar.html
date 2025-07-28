@@ -1,0 +1,179 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+
+  <style>
+    table {
+      background-color: #fffffc;
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 2px;
+      text-align: left;
+      height: 100px;
+      vertical-align: top;
+      word-wrap: break-word;
+      width: 14.28%;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      height: 30px;
+      text-align: center;
+    }
+
+    .weekend {
+      color: red;
+    }
+
+    .saturday {
+      color: blue;
+    }
+
+    .calendar-cell-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 100%;
+      font-size: 14px;
+    }
+
+    .calendar-cell-content span:first-child {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .calendar-cell-content a {
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .calendar-cell-content a:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <!-- 템플릿 정의 -->
+  <template id="calendar-cell-template">
+    <div class="calendar-cell-content">
+      <span class="calendar-date"></span>
+      <div class="schedule-list"></div>
+    </div>
+  </template>
+
+  <script>
+    async function fetchCalendarData(date_calendar, scheduleList) {
+      try {
+        const response = await fetch("/calendar/list_calendar_day?labeldate=" + date_calendar);
+        if (!response.ok) throw new Error("Fetch error");
+
+        const data = await response.json();
+
+        data.forEach(item => {
+          const a = document.createElement("a");
+          a.href = `/calendar/read/${item.calendarno}`;
+          a.textContent = item.label;
+          scheduleList.appendChild(a);
+        });
+      } catch (e) {
+        console.error("Error fetching calendar data:", e);
+      }
+    }
+
+    window.onload = function () {
+      const year = parseInt('[[${year}]]');
+      const month = parseInt('[[${month}]]');
+
+      document.getElementById('month_title').setAttribute('data-current_year', year);
+      document.getElementById('month_title').setAttribute('data-current_month', month);
+      document.getElementById("panel_year_month").innerHTML = `${year}년 ${month + 1}월`;
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
+
+      const calendarBody = document.querySelector("tbody");
+      calendarBody.innerHTML = "";
+
+      const template = document.getElementById("calendar-cell-template");
+
+      let row = document.createElement("tr");
+
+      for (let i = 0; i < firstDay; i++) {
+        row.appendChild(document.createElement("td"));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("td");
+        const clone = template.content.cloneNode(true);
+        const contentDiv = clone.querySelector(".calendar-cell-content");
+        const dateSpan = clone.querySelector(".calendar-date");
+        const scheduleList = clone.querySelector(".schedule-list");
+
+        const date_calendar = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        dateSpan.textContent = date_calendar;
+
+        fetchCalendarData(date_calendar, scheduleList);
+        cell.appendChild(contentDiv);
+
+        // 주말 색상
+        const weekday = (firstDay + day - 1) % 7;
+        if (weekday === 0) cell.classList.add("weekend");
+        else if (weekday === 6) cell.classList.add("saturday");
+
+        row.appendChild(cell);
+
+        if ((firstDay + day) % 7 === 0) {
+          calendarBody.appendChild(row);
+          row = document.createElement("tr");
+        }
+      }
+
+      // 마지막 행 빈 칸
+      if (row.children.length > 0 && row.children.length < 7) {
+        while (row.children.length < 7) {
+          row.appendChild(document.createElement("td"));
+        }
+        calendarBody.appendChild(row);
+      }
+    };
+
+    function changeMonth(cnt) {
+      const monthTitle = document.getElementById('month_title');
+      let year = parseInt(monthTitle.getAttribute('data-current_year'), 10);
+      let month = parseInt(monthTitle.getAttribute('data-current_month'), 10);
+
+      month += cnt;
+      if (month > 11) { month = 0; year++; }
+      else if (month < 0) { month = 11; year--; }
+
+      location.href = `/calendar/list_calendar?year=${year}&month=${month + 1}`;
+    }
+  </script>
+
+  <h4 id='month_title' data-current_year='' data-current_month=''>
+    <a href="#" onclick="changeMonth(-1)">[이전달]</a>
+    <span id='panel_year_month'></span>
+    <a href="#" onclick="changeMonth(1)">[다음달]</a>
+  </h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="weekend">일</th>
+        <th>월</th>
+        <th>화</th>
+        <th>수</th>
+        <th>목</th>
+        <th>금</th>
+        <th class="saturday">토</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+</html>

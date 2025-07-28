@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+  <div class="title_line">책 목록</div>
+  <aside class="aside_right">
+    <a href="javascript: location.reload();">새로 고침</a>
+  </aside>
+  
+  <div th:replace="~{book/list_search_com::list_search_fragment}"></div>
+  
+  <div class="menu_line"></div>
+
+  <div class="flex_div_center" style="width: 90%; margin: 0px auto;">  
+    <form name="frm" method="post" action="/book/create" th:object="${bookVO}">
+      <div style="margin-right: 2px; width: 22%; float: left;">
+        <input type="text" name="title" value="" autofocus="autofocus"
+               class="form-control" style="width: 100%;" th:field="*{title}" placeholder="책 제목">
+      </div>
+      <div style="margin-right: 2px; width: 32%; float: left;">
+        <input type="text" name="author" value="" autofocus="autofocus"
+               class="form-control" style="width: 100%;" th:field="*{author}" placeholder="저자">
+      </div>
+      <div style="margin-right: 2px; width: 32%; float: left;">
+        <input type="text" name="publisher" value="" autofocus="autofocus"
+               class="form-control" style="width: 100%;" th:field="*{publisher}" placeholder="출판사">
+      </div>
+      <!-- 출판일 (date 타입 적용) -->
+      <div style="margin-right: 2px; width: 15%; float: left;">
+        <input type="date" name="published_date" class="form-control" style="width: 100%;" 
+               th:field="*{published_date}">
+        <div th:if="${#fields.hasErrors('published_date')}" class="alert alert-danger" role="alert" style="margin-top: 5px;">
+          <div th:each="err: ${#fields.errors('published_date')}" th:text="${err}"></div>
+        </div>
+      </div>
+      
+      <div style="margin-right: 2px; width: 13%; float: left;">
+        <input type="number" name="seqno" value="" min="1" max="1000000" step="1"
+               class="form-control" style="width: 100%;" th:field="*{seqno}" placeholder="출력 순서">
+      </div>
+      
+      <div style="margin-right: 2px; width: 15%; float: left;">
+        <select id="visible" name="visible" class="form-control">
+          <option value="출력 모드" selected="selected">출력 모드</option>
+          <option value="Y">Y</option>
+          <option value="N">N</option>
+        </select>
+      </div>
+
+      <div style="margin-right: 2px; width: 13%; float: left; margin-top: 3px; margin-left: 5px;">
+        <button type="submit" class="btn btn-secondary btn-sm">등록</button>
+        <button type="reset" class="btn btn-secondary btn-sm">취소</button>
+      </div>
+    </form>
+  </div>  
+
+  <div th:replace="~{book/list_all_com::list_all_fragment}"></div> 
+</div>
+</html>

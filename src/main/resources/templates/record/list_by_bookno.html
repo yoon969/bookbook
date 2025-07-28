@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+<div layout:fragment="content">
+
+  <div class='title_line'>
+    <span th:text="${bookVO.author}" class="title_line_text"></span >
+    > <span th:text="${bookVO.title}" class="title_line_text"></span >
+  </div>
+  <aside class="aside_right">
+    <a th:href="@{|/record/create?bookno=${bookVO.bookno}|}">등록</a>
+    <span class="menu_divide">|</span>    
+    <a href="javascript:location.reload();">새로고침</a>
+  </aside>
+  
+  <div class='menu_line'></div>
+       
+  <table class="table table-striped" style='width: 100%;'>
+    <colgroup>
+      <col style='width: 10%;'/>
+      <col style='width: 90%;'/>
+    </colgroup>
+    <tr>
+      <th class='th_bs'>파일</TH>
+      <th class='th_bs'>제목</th>
+    </tr>
+   
+    <tr th:each="recordVO, status:${list}" 
+         th:attr="onclick=|location.href='/record/read?recordno=${recordVO.recordno}'|"
+         style="cursor: pointer; height: 90px;">
+      <td class='td_basic' style="vertical-align: middle; text-align: center;">
+        <div th:if="${recordVO.file1.endsWith('jpg') or recordVO.file1.endsWith('png')  or recordVO.file1.endsWith('gif') or recordVO.file1.endsWith('jpeg')}">
+          <img th:src="@{|/record/storage/${recordVO.thumb1}|}" style="width: 120px; height: 90px;">
+        </div>
+
+        <div th:if="${((recordVO.file1.endsWith('jpg') or recordVO.file1.endsWith('png')  or recordVO.file1.endsWith('gif') or recordVO.file1.endsWith('jpeg')) == false) and (recordVO.size1 > 0)}">
+          <span th:text="${recordVO.file1}"></span>
+        </div>
+
+        <div th:if="${recordVO.size1 == 0}">
+          <img src="/record/images/none1.png" style="width: 120px; height: 90px;">
+        </div>
+                
+      </td>
+      <td class='td_left'>
+        <span th:text="${recordVO.title}" style="font-weight: bold;"></span><br>
+        <span th:if="${recordVO.record.length() > 160 }" 
+                  th:text="|${recordVO.record.substring(0, 160) }...|"></span>
+        <span th:if="${recordVO.record.length() <= 160 }" 
+                  th:text="|${recordVO.record}|"></span>
+
+      </td>
+    </tr>
+  </table>
+
+ 
+   
+  <div class='bottom_menu'>
+    <button type='button' onclick="location.reload();" class="btn btn-primary btn-sm">새로 고침</button>
+  </div>
+
+</div>
+</html>

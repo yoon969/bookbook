@@ -1,0 +1,64 @@
+<!--/* 
+<div th:replace="~{book/list_all_com::list_all_fragment}"></div> 
+'/book/list_all_com.html' 파일의 list_all_fragment를 가져다 사용
+*/-->
+<div th:fragment="list_all_fragment"> 
+  <table class="table table-hover">
+    <colgroup>
+      <col style='width: 10%;'/>
+      <col style='width: 20%;'/>
+      <col style='width: 15%;'/>
+      <col style='width: 10%;'/>    
+      <col style='width: 15%;'/>
+      <col style='width: 15%;'/>
+      <col style='width: 15%;'/>
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="th_bs">책 번호</th>
+        <th class="th_bs">저자</th>
+        <th class="th_bs">제목</th>
+        <th class="th_bs">출판사</th>
+        <th class="th_bs">출판일</th>
+        <th class="th_bs">자료수</th>
+        <th class="th_bs">기타</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+      <tr th:each="bookVO, status:${list}">
+        <td class="td_bs" th:text="${no - status.index}"></td>
+        <td class="td_bs">
+          <a th:href="@{|/book/read/${bookVO.bookno}?word=${word}&now_page=${now_page}|}" style="display:block;" th:text="${bookVO.author}"></a>
+        </td>
+        <td class="td_bs">
+          <a th:href="@{|/book/read/${bookVO.bookno}?word=${word}&now_page=${now_page}|}" style="display:block;" th:text="${bookVO.title}"></a>
+        </td>
+        <td class="td_bs" th:text="${bookVO.publisher}"></td>
+        <td class="td_bs" th:text="${bookVO.published_date}"></td>
+        <td class="td_bs" th:text="${bookVO.cnt}"></td>
+        <td class="td_bs">
+          <span th:text="${bookVO.seqno}"></span>
+            <a th:href="@{|/record/list_by_bookno?bookno=${bookVO.bookno}|}"><img src="/book/images/contents.png" class="icon" title="글 목록"></a> <!-- /static 기준 -->
+            <a th:href="@{|/record/create?bookno=${bookVO.bookno}|}"><img src="/book/images/plus.png" class="icon" title="글쓰기"></a> <!-- /static 기준 -->
+          <span th:if="${bookVO.visible == 'Y'}">
+            <a th:href="@{|/book/update_visible_n/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/show.png" class="icon" title="출력"></a>
+          </span>
+          <span th:if="${bookVO.visible == 'N'}">
+            <a th:href="@{|/book/update_visible_y/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/hide.png" class="icon" title="숨김"></a>            
+          </span>
+          
+          <a th:href="@{|/book/update_seqno_forward/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/decrease.png" class="icon" title="우선순위 높임"></a>
+          <a th:href="@{|/book/update_seqno_backward/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/increase.png" class="icon" title="우선순위 낮춤"></a>
+          <a th:href="@{|/book/update/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/update.png" class="icon" title="수정"></a> <!-- /static 기준 -->
+          <a th:href="@{|/book/delete/${bookVO.bookno}?word=${word}&now_page=${now_page}|}"><img src="/book/images/delete.png" class="icon" title="삭제"></a> <!--/* /static 기준 */-->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- 페이지 버튼 목록 출력 시작 -->
+  <div class="Bottom_menu" th:utext="${paging}"></div> 
+  <!-- 페이지 버튼 목록 출력 종료 -->
+  
+</div>

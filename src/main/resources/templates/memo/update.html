@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}"> <!-- layout.html 상속-->
+  <div layout:fragment="content">
+
+    <div class="title_line">
+      메모 수정
+    </div>
+
+    <aside class="aside_right">
+      <a th:href="|javascript:location.reload();|">새로고침</a>
+      <span class="menu_divide">│</span>
+      <a th:href="@{|/memo/list|}">목록</a>
+      <span class="menu_divide">│</span>
+      <a th:href="@{|/memo/create|}">등록</a>
+    </aside>
+
+    <div class="menu_line"></div>
+
+    <form name="frm" method="post" action="./update">
+      <input type="hidden" name="memono" th:value="${memoVO.memono}">
+
+      <div>
+        <label>제목</label>
+        <input type="text" name="memotitle" th:value="${memoVO.memotitle}" required="required"
+               autofocus="autofocus" class="form-control" style="width: 100%;">
+      </div>
+
+      <div>
+        <label>내용</label>
+        <textarea name="memocontent" required="required" class="form-control" rows="12" style="width: 100%;"
+                  th:text="${memoVO.memocontent}"></textarea>
+      </div>
+
+      <div>
+        <label>작성일</label>
+        <input type="date" name="created_date" th:value="${memoVO.created_date}" disabled="disabled"
+               class="form-control" style="width: 100%;">
+      </div>
+
+      <div class="content_body_bottom">
+        <button type="submit" class="btn btn-secondary btn-sm">저장</button>
+        <button type="button" th:attr="onclick=|location.href='./list_all'|" class="btn btn-secondary btn-sm">취소(목록)</button>
+      </div>
+
+    </form>
+
+  </div>
+</html>
