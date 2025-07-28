@@ -28,6 +28,7 @@
 ---
 
 ## 🛠 프로젝트 구조
+'''
 bookstory8/
 ├── src/
 │ ├── main/
@@ -35,4 +36,4 @@ bookstory8/
 │ │ ├── resources/ # 설정파일 및 SQL 매퍼
 │ │ └── webapp/WEB-INF/view/ # 뷰(Thymeleaf JSP 또는 HTML)
 ├── build.gradle / pom.xml
-
+'''
