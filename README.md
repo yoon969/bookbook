@@ -33,9 +33,11 @@
 bookstory8/
 ├── src/
 │   └── main/
-│       ├── java/dev/mvc/bookstory/   # 컨트롤러, 서비스, DAO
-│       ├── resources/                # 설정파일 및 SQL 매퍼
-│       └── webapp/WEB-INF/view/     # 뷰 (Thymeleaf JSP 또는 HTML)
-├── build.gradle or pom.xml
-└── README.md
+│       ├── java/dev/mvc/   # 컨트롤러, 서비스, DAO
+│       └── resources/
+│           ├── mybatis/                # MyBatis 매퍼(XML)
+│           ├── static/                 # 정적 리소스 (CSS, JS, 이미지 등)
+│           ├── templates/              # 뷰 템플릿 (Thymeleaf)
+│           └── application.properties  # 환경 설정 파일
+└── build.gradle
 ```
