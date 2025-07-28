@@ -28,12 +28,14 @@
 ---
 
 ## 🛠 프로젝트 구조
-'''
+
+```
 bookstory8/
 ├── src/
-│ ├── main/
-│ │ ├── java/dev/mvc/bookstory/ # 컨트롤러, 서비스, DAO
-│ │ ├── resources/ # 설정파일 및 SQL 매퍼
-│ │ └── webapp/WEB-INF/view/ # 뷰(Thymeleaf JSP 또는 HTML)
-├── build.gradle / pom.xml
-'''
+│   └── main/
+│       ├── java/dev/mvc/bookstory/   # 컨트롤러, 서비스, DAO
+│       ├── resources/                # 설정파일 및 SQL 매퍼
+│       └── webapp/WEB-INF/view/     # 뷰 (Thymeleaf JSP 또는 HTML)
+├── build.gradle or pom.xml
+└── README.md
+```
